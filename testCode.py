@@ -115,9 +115,31 @@ def input_find_contact():
 def is_find_contact_in_list(path, find_contact)->bool:
     lst = list_from_file(path)
     string = ''
+    find_contact = find_contact.lower()
     for elem in lst:
-        string += str(elem)
+        string += str(elem).lower()
     return True if find_contact in string else False
+
+#найдем индексы запрашиваемых контактов
+def get_find_contact_index(path, find_contact):
+    matrix = matrix_from_file(path)
+    id_finders = []
+    find_contact = find_contact.lower()
+    if is_find_contact_in_list(path, find_contact):
+        for i in range(0, len(matrix)):
+            buff_string = " ".join(map(str, matrix[i])).lower()
+            if find_contact in buff_string:
+                id_finders.append(i)
+    else:
+        print("Запрашиваемые данные не найдены.")
+        return None
+    return id_finders
+def print_find_contacts(matrix, id_finders):
+    print("Найденные по вашему запросу контакты: ")
+    for index in id_finders:
+        stroka = '\n'.join(map(str, matrix[index]))
+        stroka = stroka.strip('[]')
+        print(stroka)
 
 
 
@@ -127,9 +149,8 @@ newPath = "PhoneBook.txt"
 newFile = open(newPath, 'a+')
 newFile.close()
 alex = matrix_from_file(newPath)
-
-for i in range(0, len(alex)):
-    for j in range(0, len(alex[i])):
-        print(alex[i][j], end=' ')
-    print()
+print(alex[0])
+print(' '.join(map(str, alex[0])))
+print('\n'.join(map(str, alex[0])))
+stroka = ''
 
