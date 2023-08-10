@@ -134,12 +134,61 @@ def get_find_contact_index(path, find_contact):
         print("Запрашиваемые данные не найдены.")
         return None
     return id_finders
+
+#печать найденных контактов
 def print_find_contacts(matrix, id_finders):
     print("Найденные по вашему запросу контакты: ")
-    for index in id_finders:
-        stroka = '\n'.join(map(str, matrix[index]))
-        stroka = stroka.strip('[]')
-        print(stroka)
+    for i in range(len(id_finders)):
+        print(f"  {i + 1}:")
+        for j in range(len(matrix[i])):
+            print("".join(matrix[id_finders[i]][j]), end = '')
+
+#сколько будем удалять?
+def whitch_will_del(id_finders):
+    print("Введите номер контакта, который будем удалять.")
+    print("Либо напишите ALL для удаления всех найденныйх контактов ")
+    target = input(">> ")
+    if target.isdigit():
+        target = int(target)
+        if target < len(id_finders):
+            return id_finders[target+1]
+        else:
+            gett_fail_message(1, "Вы ввели слишком большое число")
+            whitch_will_del(id_finders)
+    else:
+        target.lower()
+        if target is "all":
+            return id_finders
+
+
+
+
+
+#удаление контактов
+def dellete_some_contact(path, id_to_dell):
+    lst = list_from_file(path)
+    lst = [i for j, i in enumerate(lst) if j not in id_to_dell]
+    write_file_from_list(path, lst)
+
+
+
+
+
+
+
+#перезапись списка
+def write_file_from_list(path, lst):
+    file = open(path, "w")
+    buffer_lst = []
+    for element in lst:
+        buffer_lst.append(element)
+    for n_element in buffer_lst:
+        file.write(n_element)
+    file.close()
+
+
+
+
 
 
 
@@ -149,8 +198,6 @@ newPath = "PhoneBook.txt"
 newFile = open(newPath, 'a+')
 newFile.close()
 alex = matrix_from_file(newPath)
-print(alex[0])
-print(' '.join(map(str, alex[0])))
-print('\n'.join(map(str, alex[0])))
-stroka = ''
-
+target = input_find_contact()
+iddqg = get_find_contact_index(newPath, target)
+print_find_contacts(alex, iddqg)
