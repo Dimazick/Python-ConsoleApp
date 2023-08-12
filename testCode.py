@@ -65,6 +65,39 @@ def add_contact(path: str) -> None:
 
     file.write(' '.join(contact))
     file.close()
+#спецфункция, для выбора функций
+def get_command(path:str):
+    print("Введите команду: для просмотра доступных команд наберите *help* ")
+    command = input(">> ")
+    match command:
+        case "add": add_contact(path)
+        case "read": read_contacts(path)
+        case "find":
+            id_find_contacts = input_find_contact(path)
+
+            try:
+                print("Какие наши дальнейшие действия?")
+                exclusive_command = input(">>")
+                match exclusive_command:
+                    case "del":
+                        id_find_contacts = whitch_will_del(id_find_contacts)
+                        dellete_some_contact(path, id_find_contacts)
+
+                    case "redact":
+                        pass
+                    case "exit":
+                        pass
+                    case "main":
+                        pass
+                    case "help":
+                        pass
+
+
+            except:
+                gett_fail_message(2, "Что-то пошло не по плану")
+
+
+
 #спецфункция для спецошибок
 def gett_fail_message(type_of_message:int, message:str):
     match type_of_message:
@@ -72,6 +105,14 @@ def gett_fail_message(type_of_message:int, message:str):
         case 2: print("\*** Логическая ошибка ***/")
         case _: print("\*** Лютейшая ошибка, даже не знаю что ты сделал ***/")
     print(message)
+
+#функция вывода адресной книги
+def read_contacts(path)->None:
+    matrix = matrix_from_file(path)
+    for i in range(len(matrix)):
+        print(f"  {i + 1}:")
+        for j in range(len(matrix[i])):
+            print("".join(matrix[i][j]), end = '')
 
 #массив из файла
 def list_from_file(path):
@@ -97,17 +138,22 @@ def matrix_from_file(path):
             buffer_list = []
         else:
             buffer_list.append(a)
-
-
     return matr
 
 
 
 #удаление контакта
-def input_find_contact():
+def input_find_contact(path):
     try:
         find_contact = input("Мы будем искать >> ")
-        return find_contact
+        if is_find_contact_in_list(path, find_contact):
+            id_finders = get_find_contact_index(path, find_contact)
+            print_find_contacts(path, id_finders)
+            return id_finders
+        else:
+            gett_fail_message(2, "Искомые данные отсутствуют в файле")
+            return None
+
     except:
         gett_fail_message(3, "")
     return None
@@ -121,7 +167,7 @@ def is_find_contact_in_list(path, find_contact)->bool:
     return True if find_contact in string else False
 
 #найдем индексы запрашиваемых контактов
-def get_find_contact_index(path, find_contact):
+def get_find_contact_index(path, find_contact:str):
     matrix = matrix_from_file(path)
     id_finders = []
     find_contact = find_contact.lower()
@@ -136,12 +182,14 @@ def get_find_contact_index(path, find_contact):
     return id_finders
 
 #печать найденных контактов
-def print_find_contacts(matrix, id_finders):
+def print_find_contacts(path, id_finders):
+    matrix = matrix_from_file(path)
     print("Найденные по вашему запросу контакты: ")
     for i in range(len(id_finders)):
         print(f"  {i + 1}:")
         for j in range(len(matrix[i])):
             print("".join(matrix[id_finders[i]][j]), end = '')
+    get_command()
 
 #сколько будем удалять?
 def whitch_will_del(id_finders):
@@ -150,29 +198,27 @@ def whitch_will_del(id_finders):
     target = input(">> ")
     if target.isdigit():
         target = int(target)
-        if target < len(id_finders):
+        if target <= len(id_finders):
             return id_finders[target+1]
         else:
             gett_fail_message(1, "Вы ввели слишком большое число")
             whitch_will_del(id_finders)
     else:
         target.lower()
-        if target is "all":
+        if target == "all":
             return id_finders
-
-
+        else:
+            gett_fail_message(2, "Некорректная команда")
 
 
 
 #удаление контактов
-def dellete_some_contact(path, id_to_dell):
+def dellete_some_contact(path, id_finders):
+    id_to_dell = whitch_will_del(id_finders)
     lst = list_from_file(path)
     lst = [i for j, i in enumerate(lst) if j not in id_to_dell]
     write_file_from_list(path, lst)
-
-
-
-
+    print("Контакт(ы) удален")
 
 
 
@@ -197,7 +243,4 @@ def write_file_from_list(path, lst):
 newPath = "PhoneBook.txt"
 newFile = open(newPath, 'a+')
 newFile.close()
-alex = matrix_from_file(newPath)
-target = input_find_contact()
-iddqg = get_find_contact_index(newPath, target)
-print_find_contacts(alex, iddqg)
+get_command(newPath)
