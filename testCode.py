@@ -41,6 +41,7 @@ def add_contact_email()->str:
 def add_contact(path: str) -> None:
     file = open(path, 'a')
     contact = []
+    terminator = "*****"
     try:
         valueName = add_contact_name()
         contact.append(valueName + '\n')
@@ -64,7 +65,7 @@ def add_contact(path: str) -> None:
     except ValueError:
         gett_fail_message(1, "Ошибка при вводе электронной почты, попробуйте снова")
         # добавить возврат в главное меню
-    contact.append('******' + '\n')
+    contact.append(terminator + '\n')
     file.write(' '.join(contact))
     file.close()
 #спецфункция, для выбора функций
@@ -115,7 +116,7 @@ def gett_fail_message(type_of_message:int, message:str):
 
 #функция вывода адресной книги
 def read_contacts(path)->None:
-    matrix = matrix_from_file(path)
+    matrix = get_matrix_from_file(path)
     for i in range(len(matrix)):
         print(f"  {i + 1}:")
         for j in range(len(matrix[i])):
@@ -131,29 +132,17 @@ def list_from_file(path):
     file.close()
     return lst
 
-def read_cont(name):
-    file = open(name, 'r')
-    lst = []
-    for buff in file.readlines():
-        cont = buff.split(' ')
-        lst.append(cont)
-    file.close()
-    return lst
-
-def matrix_from_file(path):
-    lst = list_from_file(path)
+def get_matrix_from_file(path):
     buffer_list = []
-    matr = []
-    for i in range(len(lst)-1):
-        a = "******"
-
-        if i == a:
-
-            matr.append(buffer_list)
+    matrix = []
+    terminator = "****"
+    file = open(path, 'r')
+    for buff in file.readlines():
+        buffer_list.append(buff)
+        if terminator in buff:
+            matrix.append(buffer_list)
             buffer_list = []
-        else:
-            buffer_list.append(a)
-    return matr
+    return matrix
 
 
 
@@ -168,8 +157,6 @@ def input_find_contact():
         pass
 
 
-
-
 def is_find_contact_in_list(path, find_contact)->bool:
     lst = list_from_file(path)
     string = ''
@@ -180,7 +167,7 @@ def is_find_contact_in_list(path, find_contact)->bool:
 
 #найдем индексы запрашиваемых контактов
 def get_find_contact_index(path, find_contact:str):
-    matrix = matrix_from_file(path)
+    matrix = get_matrix_from_file(path)
     id_finders = []
     find_contact = find_contact.lower()
     for i in range(0, len(matrix)):
@@ -192,13 +179,13 @@ def get_find_contact_index(path, find_contact:str):
 
 #лист удаляемых контактов
 def get_del_contacts_list(path, id_finders):
-    lst = matrix_from_file(path)
+    lst = get_matrix_from_file(path)
     del_cont_matrix = lst[id_finders]
     return del_cont_matrix
 
 #печать найденных контактов
 def print_find_contacts(path, id_finders):
-    matrix = matrix_from_file(path)
+    matrix = get_matrix_from_file(path)
     print("Найденные по вашему запросу контакты: ")
     for i in range(len(id_finders)):
         print(f"  {i + 1}:")
@@ -234,9 +221,7 @@ def whitch_will_del(id_finders):
 #удаление контактов
 def dellete_some_contact(path, id_finders):
     id_to_dell = whitch_will_del(id_finders)
-    matrix = matrix_from_file(path)
-    #del_list = get_del_contacts_list(path, id_to_dell)
-    #lst = [i for j, i in enumerate(lst) if j not in del_list]
+    matrix = get_matrix_from_file(path)
     new_matrix=[]
     for i in range(len(matrix)):
         for j in range(len(id_to_dell)):
@@ -252,12 +237,11 @@ def dellete_some_contact(path, id_finders):
 def write_file_from_list(path, lst):
     file = open(path, "w")
     buffer_lst = []
-    count = 0
     for contact in lst:
         for string in contact:
-            buffer_lst[count].append("".join(string))
-        buffer_lst.append([])
-        count += 1
+            buffer_lst.append("".join(string))
+
+
     for n_element in buffer_lst:
         file.write(n_element)
     file.close()
@@ -270,5 +254,6 @@ def write_file_from_list(path, lst):
 
 
 newPath = "PhoneBook.txt"
+
 
 get_command(newPath)
