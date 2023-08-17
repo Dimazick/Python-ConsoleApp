@@ -246,6 +246,63 @@ def write_file_from_list(path, lst):
         file.write(n_element)
     file.close()
 
+#редактирование контакта
+def redact_contact(path, id_to_red):
+    matrix = get_matrix_from_file(path)
+    id_red_info = what_info_redact()
+    print("Введите изменения:")
+    match id_red_info:
+        case 0:
+            redaction = add_contact_name()
+        case 2:
+            redaction = add_contact_phone_number()
+        case 4:
+            redaction = add_contact_email()
+        case _:
+            #добавить гет команд и ошибку
+            pass
+    matrix[id_to_red][id_red_info] = redaction
+    write_file_from_list(path, matrix)
+
+
+def whitch_will_redact(id_finders)->int:
+    print("Введите номер контакта, который будем редактировать.")
+    id_to_red = -1
+    target = input(">> ")
+    if target.isdigit():
+        target = int(target)
+        length_of_finds = len(id_finders)
+        if target <= length_of_finds:
+            id_to_red = id_finders[target - 1]
+            return id_to_red
+        else:
+            gett_fail_message(1, "Вы ввели слишком большое число")
+            whitch_will_redact(id_finders)
+    else:
+        gett_fail_message(1, "Вы ввели не число, пробуем опять?")
+        whitch_will_del(id_finders)
+        #добавить выбор команды
+
+    pass
+
+def what_info_redact()->int:
+    print("Что будем изменять в контакте?")
+    print("Имя/Фамилию, номер телефона, электронную почту?")
+    target = input(f"введите команду на изменение (1) - имени контакта; (2) - телефона; (3) - адреса этектронной почты")
+    if target.isdigit():
+        target = int(target)
+        match target:
+            case 1:
+                index = 0
+            case 2:
+                index = 2
+            case 3:
+                index = 4
+            case _:
+                gett_fail_message(2, "вы ввели не ту команду")
+                #добавить гет команд
+    return index
+
 
 
 
@@ -255,5 +312,8 @@ def write_file_from_list(path, lst):
 
 newPath = "PhoneBook.txt"
 
-
-get_command(newPath)
+matrix = get_matrix_from_file(newPath)
+print(matrix[0][0])
+print(matrix[1][2])
+print(matrix[3][4])
+redact_contact(newPath, 1)
